@@ -14,7 +14,7 @@ V.settings = () => {
   <section><div class="sech"><h2 class="sec">Delivery apps</h2><button type="button" class="lnk" id="addapp">Add</button></div><div class="set">${st.deliveryApps.map((a, i) => it('', esc(a), 'Rename', `data-app="${i}"`)).join('')}</div>
   <h2 class="sec">Close-out reminders</h2><div class="set">${it('notif', `Reminders at ${SHIFTS.map(s => fmtT(s.end)).join(', ')}`, S.set.notify && Notify.state() === 'granted' ? 'On' : Notify.state() === 'denied' ? 'Blocked in browser settings' : Notify.state() === 'unsupported' ? 'Not available here' : 'Off')}</div><p class="note">Shows while the app is open or recently used. On iPhone, add it to the Home Screen first. The banner on Home always shows what is due.</p>
   <h2 class="sec">Shift times</h2><div class="set">${SHIFTS.map(s => it('', s.k, s.t, `data-shift="${s.k}"`)).join('')}</div>
-  <h2 class="sec">Google Sheets</h2><div class="set">${it('syncset', 'Connection', S.sync.url ? 'Connected' : 'Not set up')}${it('syncnow', 'Send now', '<span id="syncstat">Checking</span>')}</div>
+  <h2 class="sec">Google Sheets</h2><div class="set">${it('syncset', 'Connection', S.sync.url ? 'Connected' : 'Not set up')}${it('syncnow', 'Sync now', '<span id="syncstat">Checking</span>')}</div>
   <h2 class="sec">Theme</h2><div class="skins" role="radiogroup" aria-label="Theme">${SKINS.map(([k, n, d, c]) => `<button type="button" role="radio" class="skin" data-skin="${k}" aria-checked="${(st.skin || 'brass') === k}"><span class="sw" aria-hidden="true">${c.map(x => `<i style="background:${x}"></i>`).join('')}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div>
   <h2 class="sec">App</h2><div class="set">${it('theme', 'Look', { auto: 'Match device', light: 'Light', dark: 'Dark' }[st.theme || 'auto'])}${it('chpin', 'Change PIN', PIN ? 'On' : 'Off')}${it('locknow', 'Lock now', 'Locks by itself after 2 minutes away')}${it('backup', 'Download a backup', '.json file')}${it('impset', 'Import starting data', '.json file')}<div class="it">Storage<span id="persist">Checking</span></div></div>
   <p class="note">Everything saves on this device first, then copies to your Google Sheet when online.</p></section></div>`;
@@ -46,12 +46,18 @@ V.settings.wire = async () => {
   $$('[data-shift]').forEach(b => b.onclick = shiftTimesSheet);
   $('#theme').onclick = async () => { st.theme = { auto: 'light', light: 'dark', dark: 'auto' }[st.theme || 'auto']; await save('settings', st); render('settings'); };
   $('#syncset').onclick = () => { const s = openSheet({ label: 'Google Sheets connection', html: `<h3>Google Sheets</h3><p class="sub">Paste the web app link and the secret word from the setup steps.</p><label class="l" for="su">Web app link</label><input class="txt" id="su" type="url" inputmode="url" autocomplete="off" spellcheck="false" value="${esc(S.sync.url)}" placeholder="https://script.google.com/macros/s/.../exec"><label class="l" for="ss">Secret word</label><input class="txt" id="ss" autocomplete="off" spellcheck="false" value="${esc(S.sync.secret)}"><button type="button" class="save" data-ok>Save and send</button>` }), w = s.el;
-    w.querySelector('[data-ok]').onclick = async () => { const url = w.querySelector('#su').value.trim(); if (url && !/^https:\/\/script\.google\.com\//.test(url)) { toast('The link should start with https://script.google.com/'); return; } S.sync = { id: 'sync', url, secret: w.querySelector('#ss').value.trim() }; await DB.put('settings', S.sync); s.close(); await queueAll(); Sync.run(); render('settings'); }; };
-  $('#syncnow').onclick = () => { Sync.run(); toast('Sending…'); };
+    w.querySelector('[data-ok]').onclick = async () => { const url = w.querySelector('#su').value.trim(); if (url && !/^https:\/\/script\.google\.com\//.test(url)) { toast('The link should start with https://script.google.com/'); return; } S.sync = { id: 'sync', url, secret: w.querySelector('#ss').value.trim() }; await DB.put('settings', S.sync); s.close(); await Sync.resetPull(); await queueAll(); await Sync.run(); render('settings'); }; };
+  $('#syncnow').onclick = () => { Sync.run(); toast('Syncing…'); };
   $('#backup').onclick = () => { const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), ...S, sync: { url: S.sync.url } }, null, 1)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `deli-books-${bizDate()}.json`; a.click(); };
   const p = await navigator.storage?.persisted?.(); $('#persist') && ($('#persist').textContent = p ? 'Kept safe (persistent)' : 'Normal. Add to Home Screen to keep it safe');
-  const s = await Sync.status(); $('#syncstat') && ($('#syncstat').textContent = !S.sync.url ? 'Off' : s.pending ? `${s.pending} waiting` : 'All sent');
+  paintSyncStat();
 };
+async function paintSyncStat() {
+  const el = $('#syncstat'); if (!el) return; const s = await Sync.status();
+  const hm = s.pulledAt ? new Date(s.pulledAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+  el.textContent = !S.sync.url ? 'Off' : (s.pending ? `${s.pending} waiting` : 'All sent') + (hm ? ` · Synced ${hm}` : '');
+}
+Sync.on(paintSyncStat);
 // When Sheets is first connected, queue everything already here so the sheet starts complete.
 async function queueAll() {
   const q = await DB.all('outbox'); if (q.length) return;
