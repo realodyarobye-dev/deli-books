@@ -1,5 +1,5 @@
 // Offline shell. Bump VERSION when files change.
-const VERSION = 'deli-books-v2.2.0';
+const VERSION = 'deli-books-v2.3.0';
 const FILES = ['./', 'index.html', 'app.css', 'themes.css', 'db.js', 'sync.js', 'js/core.js', 'js/icons.js', 'js/charts.js', 'js/pad.js', 'js/ui.js', 'js/home.js', 'js/entry.js', 'js/money.js', 'js/checks.js', 'js/clover.js', 'js/settings.js', 'js/lock.js', 'js/notify.js', 'js/insights.js', 'js/report.js', 'js/main.js', 'logo.svg', 'manifest.webmanifest', 'fonts/inter-latin-wght-normal.woff2', 'fonts/satoshi-var.woff2', 'fonts/general-sans-var.woff2', 'fonts/cabinet-grotesk-var.woff2', 'fonts/fraunces-opsz.woff2', 'fonts/logo-bricolage.woff2', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())));
