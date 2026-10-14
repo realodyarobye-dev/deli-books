@@ -1,0 +1,35 @@
+/* Theme skins. html[data-skin] picks fonts and colors; html[data-theme] (or the system) picks light or dark.
+   Fonts are self-hosted: General Sans, Satoshi, Cabinet Grotesk (Fontshare FFL), Fraunces (OFL), Inter (OFL). */
+@font-face{font-family:"General Sans";src:url(fonts/general-sans-var.woff2) format("woff2");font-weight:200 700;font-display:swap}
+@font-face{font-family:Satoshi;src:url(fonts/satoshi-var.woff2) format("woff2");font-weight:300 900;font-display:swap}
+@font-face{font-family:"Cabinet Grotesk";src:url(fonts/cabinet-grotesk-var.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:Fraunces;src:url(fonts/fraunces-opsz.woff2) format("woff2");font-weight:100 900;font-display:swap}
+
+/* 1. Midnight Ledger: navy ink, amber money, emerald for good. Satoshi (tabular figures) with General Sans headings. */
+:root[data-skin=ledger]{--font:Satoshi,system-ui,sans-serif;--fontD:"General Sans",Satoshi,sans-serif;--fontN:Satoshi,system-ui,sans-serif;--ff:"tnum";--wD:600;
+ --bg:#EDF0F5;--panel:#fff;--panel2:#F5F7FA;--side:#E2E7EF;--ink:#0B1630;--text:#1E2A44;--mute:#4D5B75;--faint:#5A6680;--line:#D9DFE8;--line2:#E6EAF0;
+ --acc:#B7791F;--accB:#F2B33D;--accText:#8A5A0F;--accSoft:#FCF1DC;--pos:#047857;--posSoft:#D7F5E8;--neg:#C2362B;--negSoft:#FDE8E6;--good:#047857;--bad:#C2362B;--top:#0B1630;--heroV:#F2B33D}
+:root[data-skin=ledger][data-theme=dark]{--bg:#070D1C;--panel:#0F1930;--panel2:#15213C;--side:#0B1427;--ink:#F3F5FA;--text:#DCE2EE;--mute:#9AA6BF;--faint:#8E9AB3;--line:#1F2B47;--line2:#19243D;
+ --acc:#F2B33D;--accB:#F2B33D;--accText:#F6C76A;--accSoft:#33280F;--pos:#34D399;--posSoft:#0C3328;--neg:#FF7A6E;--negSoft:#3A1B1F;--good:#34D399;--bad:#FF7A6E;--top:#040914;
+ --shadow:0 0 0 1px #ffffff10;--shadowHi:0 0 0 1px #ffffff22,0 8px 24px -8px #000a;color-scheme:dark}
+
+/* 2. Brass & Bone: ivory paper, ink, brass. Fraunces headings, Inter for numbers. */
+:root[data-skin=brass]{--font:Inter,system-ui,sans-serif;--fontD:Fraunces,Georgia,serif;--fontN:Inter,system-ui,sans-serif;--ff:"cv11","tnum";--wD:560;
+ --bg:#F4EFE4;--panel:#FFFCF5;--panel2:#F8F2E6;--side:#EBE3D3;--ink:#1D1A16;--text:#2E2A24;--mute:#5E564A;--faint:#62594C;--line:#E2D8C5;--line2:#ECE4D4;
+ --acc:#8C6A2B;--accB:#C9A253;--accText:#6E5220;--accSoft:#F3E8CF;--pos:#2F6B4A;--posSoft:#E0EEDF;--neg:#A63A2B;--negSoft:#F7E3DD;--good:#2F6B4A;--bad:#A63A2B;--top:#1D1A16;--heroV:#D9B568;
+ --shadow:0 1px 0 0 #3b2f1a14,0 0 0 1px #3b2f1a14}
+:root[data-skin=brass][data-theme=dark]{--bg:#14120F;--panel:#1E1B16;--panel2:#26221C;--side:#181511;--ink:#F4EEE2;--text:#E5DDCD;--mute:#B0A590;--faint:#A39883;--line:#352F26;--line2:#2B261F;
+ --acc:#D9B568;--accB:#D9B568;--accText:#E5C789;--accSoft:#3A2F1A;--pos:#7BC497;--posSoft:#1D3226;--neg:#F0806F;--negSoft:#3D211C;--good:#7BC497;--bad:#F0806F;--top:#0C0B09;--shadow:0 0 0 1px #ffffff12;--shadowHi:0 0 0 1px #ffffff24;color-scheme:dark}
+:root[data-skin=brass] h1{font-size:24px;letter-spacing:-.02em;font-variation-settings:"opsz" 96}
+:root[data-skin=brass] .kv,:root[data-skin=brass] .mband b{font-weight:600}
+
+/* 3. Neon Deli: charcoal, vivid amber-orange, electric teal. Cabinet Grotesk display, Satoshi body. */
+:root[data-skin=neon]{--font:Satoshi,system-ui,sans-serif;--fontD:"Cabinet Grotesk",Satoshi,sans-serif;--fontN:Satoshi,system-ui,sans-serif;--ff:"tnum";--wD:800;
+ --bg:#F2F2F0;--panel:#fff;--panel2:#F7F7F5;--side:#E6E6E3;--ink:#141414;--text:#232323;--mute:#575757;--faint:#5C5C5C;--line:#DEDEDB;--line2:#E8E8E6;
+ --acc:#C2410C;--accB:#FF7A1A;--accText:#9A3412;--accSoft:#FFEAD9;--pos:#0E7C86;--posSoft:#D5F5F6;--neg:#C81E4A;--negSoft:#FCE4EA;--good:#0E7C86;--bad:#C81E4A;--top:#141414;--heroV:#FF8A2B}
+:root[data-skin=neon][data-theme=dark]{--bg:#111111;--panel:#1A1A1A;--panel2:#222;--side:#151515;--ink:#FAFAF7;--text:#E8E8E4;--mute:#A8A8A2;--faint:#9C9C96;--line:#2C2C2C;--line2:#242424;
+ --acc:#FF8A2B;--accB:#FF7A1A;--accText:#FFA35C;--accSoft:#3A2312;--pos:#2DE2E6;--posSoft:#0D3335;--neg:#FF5C8A;--negSoft:#3B1724;--good:#2DE2E6;--bad:#FF5C8A;--top:#0A0A0A;--heroV:#FF8A2B;
+ --shadow:0 0 0 1px #ffffff12;--shadowHi:0 0 0 1px #FF7A1A55,0 8px 30px -10px #FF7A1A55;color-scheme:dark}
+:root[data-skin=neon] h1{font-size:26px;letter-spacing:-.025em}
+:root[data-skin=neon] .kv{font-family:"Cabinet Grotesk",sans-serif;font-weight:800;letter-spacing:-.02em}
+:root[data-skin=neon][data-theme=dark] .kpi.hero{box-shadow:inset 0 0 0 1px #FF7A1A40}

@@ -1,6 +1,6 @@
 // Tiny IndexedDB layer. Every write commits the record AND its Sheets outbox entry in one transaction.
 const DB = (() => {
-  const STORES = ['shifts','checks','bank','payroll','orders','settings','debts','delivery','outbox'];
+  const STORES = ['shifts','checks','bank','payroll','orders','settings','debts','delivery','outbox']; // 'orders' kept so v1 data is not lost; v2 does not use it
   let dbp;
   function open() {
     if (dbp) return dbp;
@@ -36,6 +36,13 @@ const DB = (() => {
     await done(tx);
     return rec;
   }
+  // Many records in one transaction (used by the starting-data import).
+  async function putMany(store, recs, tab) {
+    const d = await open(), at = new Date().toISOString();
+    const tx = d.transaction(tab ? [store, 'outbox'] : [store], 'readwrite');
+    for (const rec of recs) { rec.updatedAt = at; tx.objectStore(store).put(rec); if (tab) tx.objectStore('outbox').add({ tab, key: rec.id, row: rec, at }); }
+    await done(tx);
+  }
   async function del(store, id, tab) {
     const d = await open();
     const tx = d.transaction(tab ? [store, 'outbox'] : [store], 'readwrite', { durability: 'strict' });
@@ -49,5 +56,5 @@ const DB = (() => {
     seqs.forEach(s => tx.objectStore('outbox').delete(s));
     await done(tx);
   }
-  return { open, all, get, put, del, clearOutbox };
+  return { open, all, get, put, putMany, del, clearOutbox };
 })();
